@@ -16,6 +16,22 @@
 			"required": false,
 			"id": "lastname",
 			"order": 1
+		},
+		"defaultLocation": {
+			"name": "defaultLocation",
+			"type": "object",
+			"typeLabel": "object",
+			"required": false,
+			"id": "defaultLocation",
+			"order": 2
+		},
+		"picture": {
+			"name": "picture",
+			"type": "string",
+			"typeLabel": "string",
+			"required": false,
+			"id": "picture",
+			"order": 3
 		}
 	}
 }

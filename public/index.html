@@ -7,9 +7,16 @@
     </head>
     <body ng-controller="UserController as userCtrl">
         <div class="container" ng-controller="BookController as bookCtrl">
+           <div>
+                <div class="col-md-12">
+                    {{userCtrl.me.firstname}}
+                    <button ng-hide="userCtrl.isAuthenticated" class="btn btn-danger btn-xs" ng-click="userCtrl.login('pj','pj')">Login as PJ</button>
+                    <button ng-hide="userCtrl.isAuthenticated" class="btn btn-danger btn-xs" ng-click="userCtrl.login('matthieu','matthieu')">Login as Matthieu</button>
+                    <button ng-show="userCtrl.isAuthenticated" class="btn btn-danger btn-xs" ng-click="userCtrl.logout()">Logout</button>
+                </div>
+            </div>
             <div class="row" >
-                <h1>New item <small>{{bookIsbn || 9780307352149 }}</small></h1>
-                <h2>Search</h2>
+                <h1>Search & Select</h1>
                 <form ng-init="boolApiParams = {}" ng-submit="bookCtrl.getBooks(boolApiParams)">
                     <div class="form-group">
                         <label for="any">Any</label>
@@ -52,52 +59,54 @@
                     </div>
                     <button  type="submit"  class="btn">Search</button>
                 </form>
-                <h3>Results</h3>
                 <div ng-show="bookCtrl.bookAPI.items.length > 1">Multiple books</div>
                 <div ng-repeat="b in bookCtrl.bookAPI.items">
-                    <img class="col-md-2" ng-src="{{b.volumeInfo.imageLinks.thumbnail }}" alt="..." />
-                    <div class="col-md-10">
-                        <h1>{{b.volumeInfo.title}} <small ng-repeat="author in b.volumeInfo.authors">{{author}}</small> <button ng-click="bookCtrl.select(b)" class="btn btn-info"><span class="glyphicon glyphicon-book" aria-hidden="true"></span></button></h1>
-                        <h2><em>{{b.volumeInfo.subtitle}}</em></h2>
-                        <p>{{b.volumeInfo.publisher}} | <span ng-repeat="category in b.volumeInfo.categories ">{{category}}</span></p>
-                        <p>{{b.volumeInfo.description}}</p>
-                        <p>{{b.volumeInfo.averageRating}} | {{b.volumeInfo.publishedDate}}</p>
+                    <div class="col-md-12">
+                        <img class="col-md-2" ng-src="{{b.volumeInfo.imageLinks.thumbnail }}" alt="..." />
+                        <div class="col-md-10">
+                            <h1>{{b.volumeInfo.title}} <small ng-repeat="author in b.volumeInfo.authors">{{author}}</small> <button ng-click="bookCtrl.select(b)" class="btn btn-info"><span class="glyphicon glyphicon-book" aria-hidden="true"></span></button></h1>
+                            <h2><em>{{b.volumeInfo.subtitle}}</em></h2>
+                            <p>{{b.volumeInfo.publisher}} | <span ng-repeat="category in b.volumeInfo.categories ">{{category}}</span></p>
+                            <p>{{b.volumeInfo.description}}</p>
+                            <p>{{b.volumeInfo.averageRating}} | {{b.volumeInfo.publishedDate}}</p>
+                        </div>
                     </div>
-                    <hr/>
                 </div>
-                <h2>The book</h2>
-                <h2>The creator</h2>
-                <div class="col-md-12">
-                    {{userCtrl.me.firstname}}
-                    <button ng-hide="userCtrl.isAuthenticated" class="btn btn-danger btn-xs" ng-click="userCtrl.login('pj','pj')">Login as PJ</button>
-                    <button ng-hide="userCtrl.isAuthenticated" class="btn btn-danger btn-xs" ng-click="userCtrl.login('matthieu','matthieu')">Login as Matthieu</button>
-                    <button ng-show="userCtrl.isAuthenticated" class="btn btn-danger btn-xs" ng-click="userCtrl.logout()">Logout</button>
+                <hr/>
+                <h1>Add a book</h1>
+                <div class="row center-block">
+                    <img class="col-md-3" ng-src="{{bookCtrl.selectedBook.volumeInfo.imageLinks.thumbnail }}" alt="..." />
+
+                    <div class="col-md-1 center-block"><span class="center-block glyphicon glyphicon-plus" aria-hidden="true"></span></div>
+
+                    <div class="col-md-3" id="locationPicker">
+                        <ui-gmap-google-map
+                            center='bookCtrl.map.center'
+                            zoom='bookCtrl.map.zoom'
+                            >
+                            <ui-gmap-marker 
+                                    idKey='-1'
+                                    coords="{latitude:0, longitude:0}"
+                                    events="bookCtrl.map.markerEvents"
+                                    options="{
+                                             'draggable': true,
+                                             }"
+                                >
+                            </ui-gmap-marker>
+                        </ui-gmap-google-map> 
+                    </div>
+
+                    <div class="col-md-1 center-block"><span class="center-block glyphicon glyphicon-plus" aria-hidden="true"></span></div>
+
+                    <img class="col-md-3" ng-src="{{userCtrl.me.picture}}" alt="...">
                 </div>
-                
-                <h2>The place</h2>
-                <div class="form-group">
-                    <label for="latitude">Latitude</label>
-                    <input
-                       type="number"
-                       class="form-control"
-                       ng-model="bookLat"
-                       id="latitude"/>
-                </div>
-                <div class="form-group">
-                    <label for="longitude">Longitude</label>
-                    <input
-                       type="number"
-                       class="form-control"
-                       ng-model="bookLng"
-                       id="longitude"/>
-                </div>
-                <button
+                <button ng-show="userCtrl.isAuthenticated"
                     ng-show="bookCtrl.canCreate()"
                     class="btn btn-success"
-                    ng-click="bookCtrl.create(userCtrl.me, bookIsbn, {'latitude': bookLat, 'longitude':bookLng} )">Create {{userCtrl.me.firstname}} {{bookIsbn}} {{bookLat}} {{bookLng}}</button>
+                    ng-click="bookCtrl.create(bookCtrl.selectedBook.volumeInfo)">Create</button>
             </div>
             <div class="row">
-                <h2>Map</h2>
+                <h2>Map view</h2>
                 <ui-gmap-google-map
                     style="height: 400px"
                     center='bookCtrl.map.center'
@@ -112,26 +121,35 @@
             </div>
             <div class="row">
                 <h2>Bibliothèque</h2>
+                <div class="form-group">
+                    <label for="filter">Filter</label>
+                    <input
+                       type="text"
+                       class="form-control"
+                       ng-model="filter"
+                       id="filter"/>
+                </div>
                 <div class="col-md-12">
                 <table class="table table-striped table-hover">
                     <thead>
                         <td>Title</td>
                         <td>Handler</td>
-                        <td>Here since</td>
                         <td>ISBN</td>
-                        <td>Seen last time @</td>
+                        <td>Created</td>
                         <td>Action(s)</td>
                     </thead>
                     <tbody>
                         <tr ng-repeat="book in bookCtrl.books">
                             <td>{{book.title || book.id}}</td>
                             <td>{{book.handler || "-"}}</td>
-                            <td>{{book.hereSince || "-"}}</td>
-                            <td>{{book.ISBN}}</td>
-                            <td>{{bookCtrl.lastCoordsOf(book)}}</td>
+                            <td>{{book.isbn}}</td>
+                            <td>{{book.creationDate | date}}</td>
                             <td>
                                 <button class="btn btn-danger" ng-hide="{{book.creator !== userCtrl.me.id}}" ng-click="bookCtrl.delete(book.id)"><span class="glyphicon glyphicon-trash" aria-hidden="true"></span></button>
-                                <button class="btn btn-info"><span class="glyphicon glyphicon-info-sign" aria-hidden="true"></span></button>
+                                <button class="btn btn-info"><span class="glyphicon glyphicon-print" aria-hidden="true"></span> Book identifier</button>
+                                <button class="btn btn-info"><span class="glyphicon glyphicon-comment" aria-hidden="true"></span> Ask</button>
+                                <button class="btn btn-info"><span class="glyphicon glyphicon-map-marker" aria-hidden="true"></span> Update location</button>
+                                <button class="btn btn-info"><span class="glyphicon glyphicon-record" aria-hidden="true"></span> Focus</button>
                             </td>
                         </tr>
                     </tbody>
@@ -139,32 +157,7 @@
             </div>
             </div>
         </div>
-        <div class="row" >
 
-        </div>
-            <div class="row hidden">
-                <form class="form-inline col-md-12" name="" ng-submit="store.submit()">
-                  <div class="form-group">
-                    <input type="text" class="form-control" id="name" placeholder="Product" ng-model="form.name">
-                  </div>
-                  <div class="form-group">
-                    <input type="price" class="form-control"  placeholder="100.00" ng-model="form.price">
-                  </div>
-                  <button type="submit" class="btn btn-default">Create</button>
-                </form> 
-            </div>
-            <div ng-repeat="product in store.products | orderBy:'-price'" class="row hidden">
-                <div class="product col-md-12" ng-hide="store.product.soldOut">
-                    <h1>{{product.name}}</h1>
-                    <h2><em class="pull-right">{{product.price | currency}}</em></h2>
-                    <p>{{product.description}}</p>
-
-                    <button ng-show="product.canPurchase" class="btn btn-success btn-xs">Add to cart</button>
-                    <button class="btn btn-danger btn-xs" ng-click="store.delete(product.id)">Delete {{product.id}}</button>
-                    <hr>
-                </div>
-            </div>
-        </div>
         <script type="text/javascript" src="./js/jquery-2.1.3.js"></script>
         <script type="text/javascript" src="./dpd.js"></script>
         <script type="text/javascript" src="./js/angular-1.3.15.js"></script>

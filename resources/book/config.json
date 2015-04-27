@@ -1,19 +1,19 @@
 {
 	"type": "Collection",
 	"properties": {
-		"ISBN": {
-			"name": "ISBN",
+		"isbn": {
+			"name": "isbn",
 			"type": "number",
 			"typeLabel": "number",
-			"required": true,
-			"id": "ISBN",
+			"required": false,
+			"id": "isbn",
 			"order": 0
 		},
 		"creator": {
 			"name": "creator",
 			"type": "string",
 			"typeLabel": "string",
-			"required": true,
+			"required": false,
 			"id": "creator",
 			"order": 1
 		},
@@ -32,6 +32,30 @@
 			"required": false,
 			"id": "handler",
 			"order": 3
+		},
+		"title": {
+			"name": "title",
+			"type": "string",
+			"typeLabel": "string",
+			"required": false,
+			"id": "title",
+			"order": 4
+		},
+		"creationDate": {
+			"name": "creationDate",
+			"type": "number",
+			"typeLabel": "number",
+			"required": false,
+			"id": "creationDate",
+			"order": 5
+		},
+		"publisher": {
+			"name": "publisher",
+			"type": "string",
+			"typeLabel": "string",
+			"required": false,
+			"id": "publisher",
+			"order": 6
 		}
 	}
 }

@@ -7,12 +7,8 @@
         this.canCreate = function () {
             return this.books !== [];
         };
-        this.create = function(creator, bookISBN, coords) {
-            $http.post("/book", {
-                ISBN: bookISBN,
-                creator: creator.id,
-                coords: [coords]
-            })
+        this.create = function(volumeInfo) {
+            $http.post("/book", volumeInfo)
             .success(function (aBook) {
                 bookController.books.push(aBook);
             })
@@ -22,10 +18,10 @@
         }
         this.map = {
             center: {
-                latitude: 45,
-                longitude: -73
+                latitude: 0,
+                longitude: 0
             },
-            zoom: 1,
+            zoom: 2,
             markers: [
                 {
                     idKey: "1",
@@ -37,10 +33,19 @@
             ],
             eventsHandler: {
                 'click': function (maps, eventName, arguments ) {
-                    console.log(maps, eventName, arguments);
+                    console.log("click on :", maps, eventName, arguments);
+                },
+                'bounds_changed': function (maps, eventName, arguments ) {
+                    console.log("bounds_changed");
+                    maps.getBounds().getNorthEast().lat();
+                    maps.getBounds().getSouthWest().lng();
+                }
+            },
+            markerEvents: {
+                'dragend': function (marker, eventName, model, arguments ) {
                     $scope.bookLat = arguments[0].latLng.lat();
                     $scope.bookLng = arguments[0].latLng.lng();
-                    $scope.$apply();
+                    bookController.selectedBook.volumeInfo.coords = [{'latitude': arguments[0].latLng.lat(), 'longitude': arguments[0].latLng.lng()}];
                 }
             }
         };
@@ -78,9 +83,9 @@
 
         };
         this.select = function (book) {
-            console.log("Selected:", book);
+            //console.log("Selected:", book);
             bookController.bookAPI = {};
-            
+            bookController.selectedBook = book;
             
         };
         this.getBooks = function(params) {
