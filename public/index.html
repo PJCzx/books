@@ -1,0 +1,140 @@
+<html ng-app="flyingbooks">
+    <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link rel="stylesheet" type="text/css" href="./css/normalize.css">
+        <link rel="stylesheet" type="text/css" href="./css/bootstrap.css">
+        <link rel="stylesheet" type="text/css" href="./css/map.css">
+    </head>
+    <body ng-controller="UserController as userCtrl">
+        <div class="container" ng-controller="BookController as bookCtrl">
+            <div class="row">
+                <h2>New item <small>{{bookIsbn || 9780307352149 }}</small></h2>
+                <h3>The book</h3>
+                <div class="form-group">
+                    <label for="isbn">ISBN</label>
+                    <input
+                       class="form-control"
+                       type="text"
+                       ng-model="bookIsbn"
+                       ng-change="bookCtrl.getBooksByISBN(bookIsbn)"
+                       id="isbn"/>
+                </div>
+                <div ng-if="bookCtrl.bookAPI.items.length >= 1">Multiple books</div>
+                <div ng-repeat="b in bookCtrl.bookAPI.items">
+                    <img class="col-md-2" ng-src="{{b.volumeInfo.imageLinks.thumbnail }}" alt="..." />
+                    <div class="col-md-10">
+                        <h1>{{b.volumeInfo.title}} <small ng-repeat="author in b.volumeInfo.authors">{{author}}</small></h1>
+                        <h2><em>{{b.volumeInfo.subtitle}}</em></h2>
+                        <p>{{b.volumeInfo.publisher}} | <span ng-repeat="category in b.volumeInfo.categories ">{{category}}</span></p>
+                        <p>{{b.volumeInfo.description}}</p>
+                        <p>{{b.volumeInfo.averageRating}} | {{b.volumeInfo.publishedDate}}</p>
+                    </div>
+                    <hr/>
+                </div>
+                <h3>The creator</h3>
+                <div class="col-md-12">
+                    {{userCtrl.me.firstname}}
+                    <button ng-hide="userCtrl.isAuthenticated" class="btn btn-danger btn-xs" ng-click="userCtrl.login('pj','pj')">Login as PJ</button>
+                    <button ng-hide="userCtrl.isAuthenticated" class="btn btn-danger btn-xs" ng-click="userCtrl.login('matthieu','matthieu')">Login as Matthieu</button>
+                    <button ng-show="userCtrl.isAuthenticated" class="btn btn-danger btn-xs" ng-click="userCtrl.logout()">Logout</button>
+                </div>
+                
+                <h3>The place</h3>
+                <div class="form-group">
+                    <label for="latitude">Latitude</label>
+                    <input
+                       type="number"
+                       class="form-control"
+                       ng-model="bookLat"
+                       id="latitude"/>
+                </div>
+                <div class="form-group">
+                    <label for="longitude">Longitude</label>
+                    <input
+                       type="number"
+                       class="form-control"
+                       ng-model="bookLng"
+                       id="longitude"/>
+                </div>
+                <button
+                    ng-show="bookCtrl.canCreate()"
+                    class="btn btn-success"
+                    ng-click="bookCtrl.create(userCtrl.me, bookIsbn, {'latitude': bookLat, 'longitude':bookLng} )">Create {{userCtrl.me.firstname}} {{bookIsbn}} {{bookLat}} {{bookLng}}</button>
+            </div>
+            <div class="row">
+                <h2>Map</h2>
+                <ui-gmap-google-map
+                    style="height: 400px"
+                    center='bookCtrl.map.center'
+                    zoom='bookCtrl.map.zoom'
+                    events='bookCtrl.map.eventsHandler'>
+                    <ui-gmap-marker ng-repeat="book in bookCtrl.books"
+                        idKey='book.id'
+                        coords='bookCtrl.lastCoordsOf(book)'
+                        >
+                    </ui-gmap-marker>
+                </ui-gmap-google-map>    
+            </div>
+            <div class="row">
+                <h2>Bibliothèque</h2>
+                <div class="col-md-12">
+                <table class="table table-striped table-hover">
+                    <thead>
+                        <td>Title</td>
+                        <td>Handler</td>
+                        <td>Here since</td>
+                        <td>ISBN</td>
+                        <td>Creator</td>
+                        <td>Seen last time @</td>
+                    </thead>
+                    <tbody>
+                        <tr ng-repeat="book in bookCtrl.books">
+                            <td>{{book.title || "-"}}</td>
+                            <td>{{book.handler || "-"}}</td>
+                            <td>{{book.hereSince || "-"}}</td>
+                            <td>{{book.ISBN}}</td>
+                            <td>{{book.creator}}</td>
+                            <td>{{bookCtrl.lastCoordsOf(book)}}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            </div>
+        </div>
+        <div class="row" >
+
+        </div>
+            <div class="row hidden">
+                <form class="form-inline col-md-12" name="" ng-submit="store.submit()">
+                  <div class="form-group">
+                    <input type="text" class="form-control" id="name" placeholder="Product" ng-model="form.name">
+                  </div>
+                  <div class="form-group">
+                    <input type="price" class="form-control"  placeholder="100.00" ng-model="form.price">
+                  </div>
+                  <button type="submit" class="btn btn-default">Create</button>
+                </form> 
+            </div>
+            <div ng-repeat="product in store.products | orderBy:'-price'" class="row hidden">
+                <div class="product col-md-12" ng-hide="store.product.soldOut">
+                    <h1>{{product.name}}</h1>
+                    <h2><em class="pull-right">{{product.price | currency}}</em></h2>
+                    <p>{{product.description}}</p>
+
+                    <button ng-show="product.canPurchase" class="btn btn-success btn-xs">Add to cart</button>
+                    <button class="btn btn-danger btn-xs" ng-click="store.delete(product.id)">Delete {{product.id}}</button>
+                    <hr>
+                </div>
+            </div>
+        </div>
+        <script type="text/javascript" src="./js/jquery-2.1.3.js"></script>
+        <script type="text/javascript" src="./dpd.js"></script>
+        <script type="text/javascript" src="./js/angular-1.3.15.js"></script>
+
+        <script src='//maps.googleapis.com/maps/api/js?sensor=false'></script>
+        <script type="text/javascript" src="./js/lodash.js"></script>
+        <script type="text/javascript" src="./js/angular-google-maps.js"></script>
+
+        <script type="text/javascript" src="./js/myApp/flyingbooks.js"></script>
+    </body>
+</html>

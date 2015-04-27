@@ -1,0 +1,45 @@
+{
+	"type": "Collection",
+	"properties": {
+		"name": {
+			"name": "name",
+			"type": "string",
+			"typeLabel": "string",
+			"required": false,
+			"id": "name",
+			"order": 0
+		},
+		"price": {
+			"name": "price",
+			"type": "number",
+			"typeLabel": "number",
+			"required": false,
+			"id": "price",
+			"order": 1
+		},
+		"description": {
+			"name": "description",
+			"type": "string",
+			"typeLabel": "string",
+			"required": false,
+			"id": "description",
+			"order": 2
+		},
+		"canPurchase": {
+			"name": "canPurchase",
+			"type": "boolean",
+			"typeLabel": "boolean",
+			"required": false,
+			"id": "canPurchase",
+			"order": 3
+		},
+		"soldOut": {
+			"name": "soldOut",
+			"type": "boolean",
+			"typeLabel": "boolean",
+			"required": false,
+			"id": "soldOut",
+			"order": 4
+		}
+	}
+}
