@@ -7,23 +7,57 @@
     </head>
     <body ng-controller="UserController as userCtrl">
         <div class="container" ng-controller="BookController as bookCtrl">
-            <div class="row">
-                <h2>New item <small>{{bookIsbn || 9780307352149 }}</small></h2>
-                <h3>The book</h3>
-                <div class="form-group">
-                    <label for="isbn">ISBN</label>
-                    <input
-                       class="form-control"
-                       type="text"
-                       ng-model="bookIsbn"
-                       ng-change="bookCtrl.getBooksByISBN(bookIsbn)"
-                       id="isbn"/>
-                </div>
-                <div ng-if="bookCtrl.bookAPI.items.length >= 1">Multiple books</div>
+            <div class="row" >
+                <h1>New item <small>{{bookIsbn || 9780307352149 }}</small></h1>
+                <h2>Search</h2>
+                <form ng-init="boolApiParams = {}" ng-submit="bookCtrl.getBooks(boolApiParams)">
+                    <div class="form-group">
+                        <label for="any">Any</label>
+                        <input
+                           class="form-control"
+                           type="text"
+                           ng-model="boolApiParams.any"
+                           id="any"/>
+                    </div>                <div class="form-group">
+                        <label for="isbn">ISBN</label>
+                        <input
+                           class="form-control"
+                           type="text"
+                           ng-model="boolApiParams.isbn"
+                           id="isbn"/>
+                    </div>
+                    <div class="form-group">
+                        <label for="title">Title</label>
+                        <input
+                           class="form-control"
+                           type="text"
+                           ng-model="boolApiParams.intitle"
+                           id="title"/>
+                    </div>
+                    <div>
+                        <label for="author">Author</label>
+                        <input
+                           class="form-control"
+                           type="text"
+                           ng-model="boolApiParams.inauthor"
+                           id="author"/>
+                    </div>
+                    <div>
+                        <label for="publisher">Publisher</label>
+                        <input
+                           class="form-control"
+                           type="text"
+                           ng-model="boolApiParams.inpublisher "
+                           id="publisher"/>
+                    </div>
+                    <button  type="submit"  class="btn">Search</button>
+                </form>
+                <h3>Results</h3>
+                <div ng-show="bookCtrl.bookAPI.items.length > 1">Multiple books</div>
                 <div ng-repeat="b in bookCtrl.bookAPI.items">
                     <img class="col-md-2" ng-src="{{b.volumeInfo.imageLinks.thumbnail }}" alt="..." />
                     <div class="col-md-10">
-                        <h1>{{b.volumeInfo.title}} <small ng-repeat="author in b.volumeInfo.authors">{{author}}</small></h1>
+                        <h1>{{b.volumeInfo.title}} <small ng-repeat="author in b.volumeInfo.authors">{{author}}</small> <button ng-click="bookCtrl.select(b)" class="btn btn-info"><span class="glyphicon glyphicon-book" aria-hidden="true"></span></button></h1>
                         <h2><em>{{b.volumeInfo.subtitle}}</em></h2>
                         <p>{{b.volumeInfo.publisher}} | <span ng-repeat="category in b.volumeInfo.categories ">{{category}}</span></p>
                         <p>{{b.volumeInfo.description}}</p>
@@ -31,7 +65,8 @@
                     </div>
                     <hr/>
                 </div>
-                <h3>The creator</h3>
+                <h2>The book</h2>
+                <h2>The creator</h2>
                 <div class="col-md-12">
                     {{userCtrl.me.firstname}}
                     <button ng-hide="userCtrl.isAuthenticated" class="btn btn-danger btn-xs" ng-click="userCtrl.login('pj','pj')">Login as PJ</button>
@@ -39,7 +74,7 @@
                     <button ng-show="userCtrl.isAuthenticated" class="btn btn-danger btn-xs" ng-click="userCtrl.logout()">Logout</button>
                 </div>
                 
-                <h3>The place</h3>
+                <h2>The place</h2>
                 <div class="form-group">
                     <label for="latitude">Latitude</label>
                     <input
@@ -84,7 +119,6 @@
                         <td>Handler</td>
                         <td>Here since</td>
                         <td>ISBN</td>
-                        <td>Creator</td>
                         <td>Seen last time @</td>
                         <td>Action(s)</td>
                     </thead>
@@ -94,10 +128,9 @@
                             <td>{{book.handler || "-"}}</td>
                             <td>{{book.hereSince || "-"}}</td>
                             <td>{{book.ISBN}}</td>
-                            <td>{{book.creator}}</td>
                             <td>{{bookCtrl.lastCoordsOf(book)}}</td>
                             <td>
-                                <button class="btn btn-danger" ng-click="bookCtrl.delete(book.id)"><span class="glyphicon glyphicon-trash" aria-hidden="true"></span></button>
+                                <button class="btn btn-danger" ng-hide="{{book.creator !== userCtrl.me.id}}" ng-click="bookCtrl.delete(book.id)"><span class="glyphicon glyphicon-trash" aria-hidden="true"></span></button>
                                 <button class="btn btn-info"><span class="glyphicon glyphicon-info-sign" aria-hidden="true"></span></button>
                             </td>
                         </tr>

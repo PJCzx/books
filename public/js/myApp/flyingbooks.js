@@ -8,7 +8,7 @@
             return this.books !== [];
         };
         this.create = function(creator, bookISBN, coords) {
-            $http.post("http://localhost:2403/book", {
+            $http.post("/book", {
                 ISBN: bookISBN,
                 creator: creator.id,
                 coords: [coords]
@@ -49,7 +49,7 @@
         this.lastCoordsOf = function(book) {
             return book.coords[book.coords.length - 1];
         };
-        $http.get("http://localhost:2403/book")
+        $http.get("/book")
             .success(function(data, status, headers, config) {
             bookController.books = data;
         })
@@ -57,7 +57,7 @@
             console.log("Error while fetching books.");
         });
         this.delete = function (bookId) {
-            $http.delete("http://localhost:2403/book/" + bookId)
+            $http.delete("/book/" + bookId)
                 .success(function() {
                 var index = -1;
                 for(var i = 0; i < bookController.books.length; i++) {
@@ -77,17 +77,40 @@
             });
 
         };
+        this.select = function (book) {
+            console.log("Selected:", book);
+            bookController.bookAPI = {};
+            
+            
+        };
+        this.getBooks = function(params) {
+            //if(params.isbn.length !== 13) return;
+            var r = "";
+            
+            if(params.any !== undefined){
+                r+= params.any;
+            }
+            
+            
+            for(var param in params) {
+                //console.log(param, params[param]);
+                if (params[param] != "" && param !== "any")
+                {
+                    if(r !== "") r += "+";
+                    r+=  param + ":" + params[param];
+                }
+            }
+            console.log("Fetch request >" + r);
+            
+            if(r === "") return;
 
-        this.getBooksByISBN = function(isbn) {
-            if(isbn.length !== 13) return;
-            console.log("Fetch for : " + isbn);
             $http({
                 url: bookController.apiUrl, 
                 method: "GET",
-                params: {"q" : "isbn:" + isbn}
+                params: {"q" : r}
              })
                 .success(function(data, status, headers, config) {
-                console.log(data, status, headers, config);
+                //console.log(data, status, headers, config);
                 bookController.bookAPI = data;
             })
                 .error(function(){});
@@ -128,5 +151,14 @@
         this.test = function(){
             this.me = "Ok...";
         };
+        
+        $http.get("/users/me")
+            .success(function(obj) {
+            userController.isAuthenticated = obj ? true : false;
+            userController.me = obj || {};
+        })
+            .error(function() {
+            console.log("error in gettin current user");
+        });
     });
 })();
