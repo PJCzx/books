@@ -56,6 +56,28 @@
             .error(function(data, status, headers, config) {
             console.log("Error while fetching books.");
         });
+        this.delete = function (bookId) {
+            $http.delete("http://localhost:2403/book/" + bookId)
+                .success(function() {
+                var index = -1;
+                for(var i = 0; i < bookController.books.length; i++) {
+                    if(bookController.books[i].id === bookId) {
+                        index = i;
+                        continue;
+                    }
+                }
+                if (index > -1) {
+                    bookController.books.splice(index, 1);
+                }
+                
+
+            })
+            .error(function(err) {
+                alert(err.message);
+            });
+
+        };
+
         this.getBooksByISBN = function(isbn) {
             if(isbn.length !== 13) return;
             console.log("Fetch for : " + isbn);

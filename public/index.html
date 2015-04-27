@@ -86,15 +86,20 @@
                         <td>ISBN</td>
                         <td>Creator</td>
                         <td>Seen last time @</td>
+                        <td>Action(s)</td>
                     </thead>
                     <tbody>
                         <tr ng-repeat="book in bookCtrl.books">
-                            <td>{{book.title || "-"}}</td>
+                            <td>{{book.title || book.id}}</td>
                             <td>{{book.handler || "-"}}</td>
                             <td>{{book.hereSince || "-"}}</td>
                             <td>{{book.ISBN}}</td>
                             <td>{{book.creator}}</td>
                             <td>{{bookCtrl.lastCoordsOf(book)}}</td>
+                            <td>
+                                <button class="btn btn-danger" ng-click="bookCtrl.delete(book.id)"><span class="glyphicon glyphicon-trash" aria-hidden="true"></span></button>
+                                <button class="btn btn-info"><span class="glyphicon glyphicon-info-sign" aria-hidden="true"></span></button>
+                            </td>
                         </tr>
                     </tbody>
                 </table>
