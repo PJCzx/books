@@ -1,0 +1,37 @@
+{
+	"type": "Collection",
+	"properties": {
+		"book": {
+			"name": "book",
+			"type": "string",
+			"typeLabel": "string",
+			"required": true,
+			"id": "book",
+			"order": 0
+		},
+		"place": {
+			"name": "place",
+			"type": "string",
+			"typeLabel": "string",
+			"required": true,
+			"id": "place",
+			"order": 1
+		},
+		"creator": {
+			"name": "creator",
+			"type": "string",
+			"typeLabel": "string",
+			"required": false,
+			"id": "creator",
+			"order": 2
+		},
+		"creationDate": {
+			"name": "creationDate",
+			"type": "string",
+			"typeLabel": "string",
+			"required": false,
+			"id": "creationDate",
+			"order": 3
+		}
+	}
+}

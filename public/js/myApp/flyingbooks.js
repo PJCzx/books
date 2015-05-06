@@ -7,7 +7,15 @@
         this.canCreate = function () {
             return this.books !== [];
         };
-        this.create = function(volumeInfo) {
+        this.updateBarcodes = updateBarcodes;
+        
+        $scope.$watch('this.books', function(){
+            console.log("Books changed");
+            updateBarcodes();
+        });
+        
+        this._create = function(volumeInfo, coords) {
+            volumeInfo.coords = [coords];
             $http.post("/book", volumeInfo)
             .success(function (aBook) {
                 bookController.books.push(aBook);
@@ -16,6 +24,23 @@
                 console.log(err);
             });
         }
+        this.create = function(volumeInfo, coords) {
+            volumeInfo.lat = coords.latitude;
+            volumeInfo.lon = coords.longitude;
+            $http.get("http://localhost:4730/api/book", { 
+                params: {
+                    title: volumeInfo.title,
+                    lat: volumeInfo.lat,
+                    lon: volumeInfo.lon
+                }
+            })
+            .success(function(data, status, headers, config) {
+                console.log("succes:", data);
+                })
+            .error(function(data, status, headers, config) {
+                console.log("error:", data);
+            });
+        };
         this.map = {
             center: {
                 latitude: 0,
@@ -45,14 +70,13 @@
                 'dragend': function (marker, eventName, model, arguments ) {
                     $scope.bookLat = arguments[0].latLng.lat();
                     $scope.bookLng = arguments[0].latLng.lng();
-                    bookController.selectedBook.volumeInfo.coords = [{'latitude': arguments[0].latLng.lat(), 'longitude': arguments[0].latLng.lng()}];
                 }
             }
         };
         this.apiUrl = 'https://www.googleapis.com/books/v1/volumes';
 
         this.lastCoordsOf = function(book) {
-            return book.coords[book.coords.length - 1];
+            return book.coords !== undefined ? book.coords[book.coords.length - 1] : {"latitude": 0, "longitude": 0};
         };
         $http.get("/book")
             .success(function(data, status, headers, config) {
@@ -121,6 +145,36 @@
                 .error(function(){});
         };
         
+        this.test = function(obj) {
+            alert( obj || "Test");
+            console.log( obj || "Test");
+        };
+        
+        this.fullTextSearch = function (text) {
+            $scope.check = text;
+            $http.get("http://localhost:4730/api/fulltext/books", {params: {text:text}})
+                .success(function (data, status, headers, config) {
+                    console.log(data, config);
+                    $scope.results = data;
+            }); 
+        };
+            
+        this.geoDisatanceSearch = function () {
+            $http.get("http://localhost:4730/api/books/geodistance", {
+                params: {
+                      distance: $scope.distance + "km",
+                      lat: 41.12,
+                      lon: -71.34
+                  }})
+                .success(function (data, status, headers, config) {
+                    console.log(data, config);
+                    $scope.results = data;
+            });
+            
+        };
+        
+        
+        
     });
     
     app.controller("UserController", function($scope, $http) {
@@ -153,10 +207,7 @@
             });
             
         };
-        this.test = function(){
-            this.me = "Ok...";
-        };
-        
+
         $http.get("/users/me")
             .success(function(obj) {
             userController.isAuthenticated = obj ? true : false;

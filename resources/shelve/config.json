@@ -1,0 +1,45 @@
+{
+	"type": "Collection",
+	"properties": {
+		"name": {
+			"name": "name",
+			"type": "string",
+			"typeLabel": "string",
+			"required": false,
+			"id": "name",
+			"order": 0
+		},
+		"latLng": {
+			"name": "latLng",
+			"type": "object",
+			"typeLabel": "object",
+			"required": true,
+			"id": "latLng",
+			"order": 1
+		},
+		"public": {
+			"name": "public",
+			"type": "boolean",
+			"typeLabel": "boolean",
+			"required": false,
+			"id": "public",
+			"order": 2
+		},
+		"creator": {
+			"name": "creator",
+			"type": "string",
+			"typeLabel": "string",
+			"required": false,
+			"id": "creator",
+			"order": 3
+		},
+		"creationDate": {
+			"name": "creationDate",
+			"type": "string",
+			"typeLabel": "string",
+			"required": false,
+			"id": "creationDate",
+			"order": 4
+		}
+	}
+}
